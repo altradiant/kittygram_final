@@ -2,8 +2,10 @@ version: '3'
 
 volumes:
   pg_data:
-  static:
-  media:
+  # Изменим имена volume'ов для ясности
+  static_backend_volume:
+  media_backend_volume:
+  static_frontend_volume:
 
 services:
   db:
@@ -15,22 +17,30 @@ services:
   backend:
     build: ./backend/
     env_file: .env
+    # Команда для сбора статики перед запуском Gunicorn
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             gunicorn kittygram_backend.wsgi:application --bind 0.0.0.0:8000"
     volumes:
-      - static:/static
-      - media:/media
+      - static_backend_volume:/app/static  # Сопоставляем с STATIC_ROOT
+      - media_backend_volume:/app/media   # Сопоставляем с MEDIA_ROOT
 
   frontend:
     env_file: .env
     build: ./frontend/
-    command: cp -r /app/build/. /static/
+    command: cp -r /app/build/. /static_frontend/ # Копируем в новую папку
     volumes:
-      - static:/static
+      - static_frontend_volume:/static_frontend
 
   gateway:
     build: ./nginx/
-    env_file: .env
     ports:
       - 8000:80
     volumes:
-      - static:/static
-      - media:/media
+      # Nginx должен иметь доступ ко всем трем папкам
+      - static_frontend_volume:/static_frontend:ro
+      - static_backend_volume:/static_backend:ro
+      - media_backend_volume:/media_backend:ro
+    depends_on: # Явно указываем зависимости
+      - backend
+      - frontend

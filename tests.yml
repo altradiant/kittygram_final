@@ -1,2 +1,4 @@
 repo_owner: altradiant
 dockerhub_username: aradiant
+taski_domain: https://www.example.com/
+kittygram_domain: https://www.example.com/

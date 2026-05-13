@@ -83,7 +83,7 @@ jobs:
           # Для каждого пересобранного образа 
           # устанавливаем тег latest, чтобы потом
           # на сервере и в docker-compose.yml не указывать версию
-          tags: aradiant/kittygram_final:latest
+          tags: aradiant/kittygram_backend:latest
 
   frontend_tests:
     runs-on: ubuntu-latest
@@ -126,7 +126,7 @@ jobs:
         with:
           context: ./frontend/
           push: true
-          tags: aradiant/kittygram_final:latest
+          tags: aradiant/kittygram_frontend:latest
 
 # nginx
   build_gateway_and_push_to_docker_hub:
@@ -148,7 +148,7 @@ jobs:
           context: ./nginx/
           push: true
           # Тут вместо username должен быть ваш логин на Docker Hub
-          tags: aradiant/kittygram_final:latest
+          tags: aradiant/kittygram_gateway:latest
 
 # pytest (обрезанный)
   run_pytest:
